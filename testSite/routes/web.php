@@ -11,13 +11,13 @@
 |
 */
 
-Route::get('/', 'HomeController@index')->name('homeIndex');
-
-Route::get('/bad/all', 'BadDomainController@index');
-Route::get('/bad/{id}', 'BadDomainController@show');
-
-Route::get('/click/{id}', 'ClickController@show');
-Route::get('/click', 'ClickController@trackLink');
-
-Route::get('/success/{id_click}','ClickController@success')->name('idSuccess');
-Route::get('/error/{id_click}','ClickController@error')->name('idError');
+//Route::get('/', 'HomeController@index')->name('homeIndex');
+//
+//Route::get('/bad/all', 'BadDomainController@index');
+//Route::get('/bad/{id}', 'BadDomainController@show');
+//
+//Route::get('/click/{id}', 'ClickController@show');
+//Route::get('/click', 'ClickController@trackLink');
+//
+//Route::get('/success/{id_click}','ClickController@success')->name('idSuccess');
+//Route::get('/error/{id_click}','ClickController@error')->name('idError');
