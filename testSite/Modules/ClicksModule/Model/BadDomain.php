@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace Modules\ClicksModule\Model;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,6 +15,6 @@ class BadDomain extends Model
 
     public function clicks()
     {
-        return $this->hasMany('App\Click');
+        return $this->hasMany('Modules\ClicksModule\Click');
     }
 }

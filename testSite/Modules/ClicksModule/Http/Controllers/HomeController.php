@@ -2,7 +2,7 @@
 
 namespace Modules\ClicksModule\Http\Controllers;
 
-use App\Click;
+use Modules\ClicksModule\Model\Click;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 

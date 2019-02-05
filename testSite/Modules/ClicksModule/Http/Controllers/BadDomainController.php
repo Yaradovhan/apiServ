@@ -5,7 +5,7 @@ namespace Modules\ClicksModule\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use App\BadDomain;
+use Modules\ClicksModule\Model\BadDomain;
 
 class BadDomainController extends Controller
 {
@@ -28,7 +28,7 @@ class BadDomainController extends Controller
     {
         $bad = BadDomain::find($id);
         if (is_null($bad)) {
-            return response()->json(null, 404);
+            return response()->json(null, 200);
         }
         $response = BadDomain::with('clicks')->findOrFail($id);
 
@@ -36,41 +36,52 @@ class BadDomainController extends Controller
     }
 
     /**
+     * "name":"value of name"
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return string
      */
 
-    /*
-        {
-	        "name":"value of name"
-        }
-     */
     public function create(Request $request)
     {
-        $domain = BadDomain::create($request->all());
+        try {
+            $domain = BadDomain::create($request->all());
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+
         return response()->json($domain, 201);
     }
 
     /**
      * @param Request $request
      * @param BadDomain $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return string
      * @throws \Exception
      */
     public function destroy(Request $request, BadDomain $id)
     {
-        $id->delete();
+        try {
+            $id->delete();
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+
         return response()->json(null, 204);
     }
 
     /**
      * @param Request $request
      * @param BadDomain $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return string
      */
     public function update(Request $request, BadDomain $id)
     {
-        $id->update($request->all());
+        try {
+            $id->update($request->all());
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+
         return response()->json($id, 200);
     }
 }

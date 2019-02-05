@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Click;
+use Modules\ClicksModule\Model\Click;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Click;
-use App\BadDomain;
+use Modules\ClicksModule\Model\Click;
+use Modules\ClicksModule\Model\BadDomain;
 use Faker\Provider\Internet;
 use Illuminate\Http\Request;
 

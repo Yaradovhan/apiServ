@@ -3,8 +3,8 @@
 namespace Modules\ClicksModule\Http\Controllers;
 
 
-use App\Click;
-use App\BadDomain;
+use Modules\ClicksModule\Model\Click;
+use Modules\ClicksModule\Model\BadDomain;
 use Faker\Provider\Internet;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -23,14 +23,14 @@ class ClickController extends Controller
         if (is_null($click)) {
             return response()->json(null, 404);
         }
-        $response = Click::with('bad_domains')->findOrFail($id);
+        $response = Click::with('badDomains')->findOrFail($id);
 
         return response()->json($response, 200);
     }
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return string
      */
 
     public function trackLink(Request $request)
@@ -38,53 +38,78 @@ class ClickController extends Controller
         $p1 = isset($request->param1) ? $request->param1 : null;
         $p2 = isset($request->param2) ? $request->param2 : null;
         if (!$p1 || !$p2) {
-            $response['error'] = 'Bad params';
+            $response['error'] = 'bad parameters';
+
             return response()->json($response, 200);
         }
         $res = Click::where('param1', base64_encode($p1))->where('param2', $p2)->get()->toArray();
-        if (empty($res)) {
-            $enc = $_SERVER['REMOTE_ADDR'] . "~" . $_SERVER['REQUEST_URI'];
-            $res = Click::create([
-                'click_id' => base64_encode($enc),
-                'ua' => base64_encode($_SERVER['HTTP_USER_AGENT']),
-                'ip' => Internet::localIpv4(),
-//                'ip' => '192.168.0.0',
-                'param1' => base64_encode($p1),
-                'param2' => $p2,
-            ]);
+        if (!$res) {
+            $enc = request()->server('REMOTE_ADDR') . "~" . request()->server('REQUEST_URI');
+            try {
+                $res = Click::create([
+                    'click_id' => base64_encode($enc),
+                    'ua' => base64_encode($_SERVER['HTTP_USER_AGENT']),
+                    'ip' => Internet::localIpv4(),
+                    'param1' => base64_encode($p1),
+                    'param2' => $p2,
+                ]);
+            } catch (\Exception $e) {
+                return $e->getMessage();
+            }
             $routeName = 'idSuccess';
-            $resBad = BadDomain::where( 'name' , $res->ip)->get()->toArray();
-            if(!empty($resBad)){
-                $res->increment('bad_domain');
+            try {
+                $resBad = BadDomain::where('name', $res->ip)->get()->toArray();
+            } catch (\Exception $e) {
+                return $e->getMessage();
+            }
+            if ($resBad) {
+                $res->increment('badDomain');
                 $routeName = 'idError';
             }
         } else {
-            $res = Click::find($res[0]['id']);
+            try{
+                $res = Click::find(reset($res)['id']);
+            } catch (\Exception $e){
+                return $e->getMessage();
+            }
             $res->increment('error');
             $routeName = 'idError';
         }
+
         return redirect(route($routeName, ['click_id' => base64_encode($res->id)]));
     }
 
     /**
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return string
      */
 
     public function error($id)
     {
-        $response = Click::with('bad_domains')->findOrFail(base64_decode($id));
+        try {
+            $response = Click::with('badDomains')->findOrFail(base64_decode($id));
+        } catch (\Exception $e) {
+
+            return $e->getMessage();
+        }
+
         return response()->json($response, 200);
     }
 
     /**
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return string
      */
 
     public function success($id)
     {
-        $response = Click::find(base64_decode($id));
+        try {
+            $response = Click::find(base64_decode($id));
+        } catch (\Exception $e) {
+
+            return $e->getMessage();
+        }
+
         return response()->json($response, 200);
     }
 
